@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\democontroller;
+use App\Http\Controllers\eventcontroller;
 use App\Models\User;
 use Illuminate\Support\Facades\App;
 
@@ -9,6 +10,8 @@ use Illuminate\Support\Facades\App;
 //     App::setLocale($lang);
 //     return view('index');
 // });
+Route::get('/foreignkey',[eventcontroller::class,'show']);
+
 Route::get('/', function () {
     return view('index');
 });

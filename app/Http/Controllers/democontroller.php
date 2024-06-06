@@ -29,14 +29,12 @@ class democontroller extends Controller{
         return redirect('/view');
     }
     public function view(Request $request){
-        $search = $request['search'] ?? "";
-        if($search != ""){
-            $user = User::where("firstname","LIKE","%".$search."%")->orWhere("email","LIKE","%".$search."%")->get();
+        $data['search'] = $request['search'] ?? "";
+        if($data['search'] != ""){
+            $data['user'] = User::where("firstname","LIKE","%".$data['search']."%")->orWhere("email","LIKE","%".$data['search']."%")->paginate(10);
         }else{
-            $user = User::paginate(10);
+            $data['user'] = User::paginate(10);
         }
-        $data['user'] = $user;
-        $data['search'] = $search;
         return view('user-view')->with($data);
     }
     public function trash(){

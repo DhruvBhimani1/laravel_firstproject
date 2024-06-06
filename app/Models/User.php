@@ -15,6 +15,5 @@ class User extends Model
     public function setFirstnameAttribute($value)
     {
         $this->attributes['firstname'] = ucwords($value);
-    }
-
+    } 
 }
