@@ -5,14 +5,15 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Auth;
+
 class democontroller extends Controller{
     public function create(){
         $data['url'] = url("register");
         $data['title'] = "Add New User";
         return view("form", $data);
     }
-
-   public function store(Request $request){
+    public function store(Request $request){
         $request->validate([
             "email"=> "required",
             "password"=> "required",
@@ -37,6 +38,17 @@ class democontroller extends Controller{
         }
         return view('user-view')->with($data);
     }
+    public function login(Request $request){
+        $credentials = $request->validate([
+        'email'=> 'required|email',
+        'password'=> 'required'
+        ]);
+        if(Auth::attempt($credentials)){
+            return redirect()->route('view');
+        }else{
+            return redirect()->route('login');
+        }
+    }
     public function trash(){
         $user = User::onlyTrashed()->get();
         $data['user'] = $user;
@@ -50,7 +62,6 @@ class democontroller extends Controller{
         }
         return redirect('/trash')->with('restore_error', 'User not found...');
     }
-    
     public function forceDelete($id) {
         $user = User::withTrashed()->find($id);
         if (!is_null($user)) {
@@ -60,8 +71,7 @@ class democontroller extends Controller{
         return redirect('/trash')->with('forcedelete_error', 'User not found...');
     }
     public function delete($id){
-        $user = User::find($id);
-        
+        $user = User::find($id);   
         if(!is_null($user)){
             $user->delete();
             return redirect('/view')->with('success', 'User deleted successfully...');
@@ -71,7 +81,6 @@ class democontroller extends Controller{
     }
     public function edit($id){
         $user = User::find($id);
-        
         if(!is_null($user)){
             $data['url'] = url('update')."/".$id;
             $data['title'] = "Update User";
@@ -80,17 +89,27 @@ class democontroller extends Controller{
         }else{
             return redirect('form')->with('error','User Not Found..');
         }
+        
     }
     public function update($id, Request $request){
+        $request->validate([
+            'firstname'=> 'required',
+            'lastname'=> 'required',
+            'email'=> 'required|email',
+        ]);
         $user = User::find($id);
         $user->firstname = $request->firstname;
         $user->lastname = $request->lastname;
         $user->email = $request->email;
         $user->save();
-        return redirect('view')->with('success','User Data successfully Updated..');
+        return redirect()->route('view')->with('success', 'User Data successfully Updated.');
     }
-
     public function upload(Request $request){
         echo $request->file('file')->store('upload');
+    }
+
+    public function logout(){
+        Auth::logout();
+        return view('login');
     }
 }
