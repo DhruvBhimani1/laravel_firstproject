@@ -10,9 +10,26 @@ use App\Mail\WelcomeEmail;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Route;
-
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Http;
 
 class democontroller extends Controller{
+    public function test($username){
+        $response = Http::get("https://api.github.com/users/{$username}/repos");
+
+        if ($response->successful()) {
+            $repositories = $response->json(); 
+            echo "<pre>";
+            print_r($repositories);
+        } else {
+            $errorCode = $response->status(); 
+            $errorMessage = $response->body();
+            return response()->json(['error' => $errorMessage], $errorCode);
+        }
+    }
+    public function index(){
+        return view("index");
+    }
     public function create(){
         $data['url'] = url("register");
         $data['title'] = "Add New User";
@@ -35,6 +52,7 @@ class democontroller extends Controller{
         return redirect('/view');
     }
     public function view(Request $request){
+        Log::info("Getting URL And user ID");
         $data['search'] = $request['search'] ?? "";
         if($data['search'] != ""){
             $data['user'] = User::where("firstname","LIKE","%".$data['search']."%")->orWhere("email","LIKE","%".$data['search']."%")->paginate(10);
@@ -51,7 +69,7 @@ class democontroller extends Controller{
         if(Auth::attempt($credentials)){
             return redirect()->route('view');
         }else{
-            return redirect()->route('login');
+            return redirect()->route('login')->with('login_error','Password is incorrect');
         }
     }
     public function trash(){
@@ -128,5 +146,17 @@ class democontroller extends Controller{
         $data['decryptdString'] = Crypt::decrypt($data['encryptdString']);
         echo "<pre>";
         print_r($data);
+    }
+    //For use to collect functionality
+    public function collection(){
+        $collection  =  collect(['dhruv', 'dhruv1', null])
+            ->map(function (?string $key) {
+                return $key;
+            })
+            ->reject(function (?string $key) { 
+                return empty($key);
+            });
+        dd($collection);
+        return $collection; 
     }
 }
