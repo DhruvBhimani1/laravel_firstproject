@@ -3,8 +3,6 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\democontroller;
 use App\Http\Controllers\eventcontroller;
-use App\Models\User;
-use Illuminate\Support\Facades\App;
 use App\Http\Middleware\WebGard;
 
 // Route::get('/{lang?}', function ($lang =null) {
@@ -12,7 +10,6 @@ use App\Http\Middleware\WebGard;
 //     return view('index');
 // });
 Route::get('/foreignkey',[eventcontroller::class,'show']);
-
 Route::get('/', function () {
     return view('index');
 });
@@ -34,3 +31,5 @@ Route::get('/trash', [democontroller::class,'trash'])->name('user.trash');
 Route::get('/restore/{id}', [democontroller::class,'restore'])->name('user.restore');
 Route::delete('/force-delete/{id}', [democontroller::class,'forceDelete'])->name('user.force-delete');
 Route::get('/logout', [democontroller::class,'logout'])->name('logout');
+//For data encrypt  
+Route::get('/encryptString', [democontroller::class,'encryptString']);

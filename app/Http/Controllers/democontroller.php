@@ -6,6 +6,11 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Auth;
+use App\Mail\WelcomeEmail;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Route;
+
 
 class democontroller extends Controller{
     public function create(){
@@ -26,7 +31,7 @@ class democontroller extends Controller{
         $user->email = $request->email;
         $user->password = bcrypt($request->password);
         $user->save();
-
+        $this->sendWelcomeEmail($user);
         return redirect('/view');
     }
     public function view(Request $request){
@@ -107,9 +112,21 @@ class democontroller extends Controller{
     public function upload(Request $request){
         echo $request->file('file')->store('upload');
     }
-
     public function logout(){
         Auth::logout();
         return view('login');
+    }
+    public function sendWelcomeEmail(User $user){
+        Mail::to($user->email)->send(new WelcomeEmail($user));
+    }
+    //For data encrypt 
+    public function encryptString(){
+        $str = 'Dhruv';
+        $data['encryptdString'] = Crypt::encrypt($str);
+        echo "<pre>";
+        print_r($data);
+        $data['decryptdString'] = Crypt::decrypt($data['encryptdString']);
+        echo "<pre>";
+        print_r($data);
     }
 }
