@@ -4,29 +4,17 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Auth;
 use App\Mail\WelcomeEmail;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Crypt;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
+use App\Http\Controllers\Controller;
+use Illuminate\Validation\ValidationException;
 
 class democontroller extends Controller{
-    public function test($username){
-        $response = Http::get("https://api.github.com/users/{$username}/repos");
-
-        if ($response->successful()) {
-            $repositories = $response->json(); 
-            echo "<pre>";
-            print_r($repositories);
-        } else {
-            $errorCode = $response->status(); 
-            $errorMessage = $response->body();
-            return response()->json(['error' => $errorMessage], $errorCode);
-        }
-    }
+   
     public function index(){
         return view("index");
     }
@@ -68,9 +56,10 @@ class democontroller extends Controller{
         ]);
         if(Auth::attempt($credentials)){
             return redirect()->route('view');
-        }else{
-            return redirect()->route('login')->with('login_error','Password is incorrect');
         }
+        return redirect()->route('login')
+        ->withErrors(['login-error' => 'Invalid email or password.'])
+        ->withInput($request->only('email'));
     }
     public function trash(){
         $user = User::onlyTrashed()->get();
@@ -156,7 +145,20 @@ class democontroller extends Controller{
             ->reject(function (?string $key) { 
                 return empty($key);
             });
-        dd($collection);
         return $collection; 
+    }
+    // For Api Function
+    public function Api($username){
+        $response = Http::get("https://api.github.com/users/{$username}/repos");
+
+        if ($response->successful()) {
+            $repositories = $response->json(); 
+            echo "<pre>";
+            print_r($repositories);
+        } else {
+            $errorCode = $response->status(); 
+            $errorMessage = $response->body();
+            return response()->json(['error' => $errorMessage], $errorCode);
+        }
     }
 }
