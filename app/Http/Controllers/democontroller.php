@@ -12,11 +12,16 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
 use App\Http\Controllers\Controller;
 use Illuminate\Validation\ValidationException;
-
+use Illuminate\Support\Facades\Storage;
+use App\Events\UserRegistered;
 class democontroller extends Controller{
    
     public function index(){
         return view("index");
+
+        // $users = User::all();
+        // $data1 = $users->toJson();
+        // print_r($data1);
     }
     public function create(){
         $data['url'] = url("register");
