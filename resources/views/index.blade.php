@@ -25,5 +25,6 @@
     </div>
     </div>
     </nav>
-    <h1 class="text-2xl test text-center">@lang('lang.welcome')</h1>
+    <h1 class="text-2xl  text-center">@lang('lang.welcome')</h1>
+    <livewire:counter />
 @endsection
